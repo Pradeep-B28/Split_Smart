@@ -4,7 +4,7 @@ export const CONFIG = {
   version: "1.0.0",
 
   // The live address. Set in Phase 4 (deploy). Used for share links and link previews.
-  siteUrl: "",
+  siteUrl: "https://split-smart-brown.vercel.app",
 
   // Sales WhatsApp: digits only, country code first. Empty hides the "Talk to us" button.
   salesWhatsApp: "",
