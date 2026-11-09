@@ -366,8 +366,15 @@ export function render() {
   initScrollReveal();
 }
 
+export function setGroupState(newGrp, isViewMode = false) {
+  group = newGrp;
+  isViewing = isViewMode;
+  if (!isViewing) saveGroup(group);
+  render();
+}
+
 // Initialize state from storage or share link
-function initState() {
+export function initState() {
   const hash = window.location.hash;
   if (hash.startsWith("#g=")) {
     const encoded = hash.slice(3);
@@ -400,4 +407,10 @@ document.addEventListener("DOMContentLoaded", function () {
   initThemeToggle();
   initLoader();
   initState();
+
+  if (typeof window !== "undefined" && window.location.search.includes("test=1")) {
+    import("./selftest.js").then(function (mod) {
+      mod.runSelfTest(render);
+    });
+  }
 });
