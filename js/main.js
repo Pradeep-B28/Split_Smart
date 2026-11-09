@@ -3,7 +3,19 @@
 
 import { CONFIG } from "../config.js";
 import { COPY, t } from "./copy.js";
-import { getTheme, setTheme } from "./store.js";
+import { newGroup, settle, decodeGroup, removeExpense } from "./engine/split.js";
+import { getTheme, setTheme, loadGroup, saveGroup } from "./store.js";
+import { renderGroupCard } from "./group-ui.js";
+import { renderPaymentCard } from "./payment-ui.js";
+import { renderPaymentsList } from "./list-ui.js";
+
+// State
+let group = newGroup("");
+let previousGroup = null;
+let editingId = null;
+let lastPayerId = null;
+let isViewing = false;
+let undoTimeout = null;
 
 // Initialize text content from COPY dictionary
 function initStaticCopy() {
@@ -59,7 +71,7 @@ function initStaticCopy() {
   if (footerPrivacy) footerPrivacy.textContent = t("footer.privacy");
 }
 
-// Logo image fallback: show "Wrench Wise" as plain text if logo image fails
+// Logo image fallback
 function initLogoFallback() {
   const handleLogoError = function (img) {
     if (!img) return;
@@ -84,7 +96,7 @@ function initLogoFallback() {
   }
 }
 
-// Theme toggle logic
+// Theme toggle
 function initThemeToggle() {
   const toggleBtn = document.getElementById("theme-toggle-btn");
   if (!toggleBtn) return;
@@ -125,10 +137,177 @@ function initLoader() {
   }, duration);
 }
 
-// Initialize on DOM ready
+// Undo Toast Management
+function showUndoToast() {
+  const toast = document.getElementById("undo-toast");
+  const msgEl = document.getElementById("undo-msg");
+  const btnEl = document.getElementById("undo-btn");
+  const timerLine = document.getElementById("undo-timer-line");
+
+  if (!toast || !msgEl || !btnEl) return;
+
+  if (undoTimeout) {
+    clearTimeout(undoTimeout);
+    undoTimeout = null;
+  }
+
+  msgEl.textContent = t("list.deleted");
+  btnEl.textContent = t("list.undo");
+
+  btnEl.onclick = function () {
+    if (previousGroup) {
+      group = previousGroup;
+      previousGroup = null;
+      if (!isViewing) saveGroup(group);
+      hideUndoToast();
+      render();
+    }
+  };
+
+  if (timerLine) {
+    timerLine.classList.remove("undo-timer-anim");
+    void timerLine.offsetWidth;
+    timerLine.classList.add("undo-timer-anim");
+  }
+
+  toast.classList.add("active");
+
+  undoTimeout = setTimeout(function () {
+    hideUndoToast();
+  }, CONFIG.undoMs || 5000);
+}
+
+function hideUndoToast() {
+  const toast = document.getElementById("undo-toast");
+  if (toast) toast.classList.remove("active");
+  if (undoTimeout) {
+    clearTimeout(undoTimeout);
+    undoTimeout = null;
+  }
+}
+
+// Updates group after a change
+function handleUpdateGroup(newGrp, payerId = null) {
+  group = newGrp;
+  if (payerId) lastPayerId = payerId;
+  if (!isViewing) saveGroup(group);
+  render();
+}
+
+// Handles payment edit trigger
+function handleEditExpense(id) {
+  if (isViewing) return;
+  editingId = id;
+  render();
+  const paymentCard = document.getElementById("payment-card");
+  if (paymentCard) {
+    paymentCard.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// Handles payment edit cancel
+function handleCancelEdit() {
+  editingId = null;
+  render();
+}
+
+// Handles payment delete with Undo
+function handleDeleteExpense(id) {
+  if (isViewing) return;
+  previousGroup = group;
+  const res = removeExpense(group, id);
+  if (res.ok) {
+    group = res.group;
+    if (editingId === id) editingId = null;
+    if (!isViewing) saveGroup(group);
+    render();
+    showUndoToast();
+  }
+}
+
+// Main render coordinator
+export function render() {
+  const groupBody = document.getElementById("group-card-body");
+  const paymentBody = document.getElementById("payment-card-body");
+  const listBody = document.getElementById("list-card-body");
+
+  // Render Group Card
+  if (groupBody) {
+    renderGroupCard(groupBody, {
+      group,
+      onUpdateGroup: handleUpdateGroup,
+      isViewing
+    });
+  }
+
+  // Render Payment Card
+  if (paymentBody) {
+    const editingExpense = editingId !== null ? group.expenses.find(function (e) { return e.id === editingId; }) : null;
+    renderPaymentCard(paymentBody, {
+      group,
+      editingExpense,
+      lastPayerId,
+      onUpdateGroup: handleUpdateGroup,
+      onCancelEdit: handleCancelEdit,
+      isViewing
+    });
+  }
+
+  // Render Payments List
+  if (listBody) {
+    renderPaymentsList(listBody, {
+      group,
+      onEditExpense: handleEditExpense,
+      onDeleteExpense: handleDeleteExpense,
+      isViewing
+    });
+  }
+
+  // Update Result Card preview (Rule 5: settle() for results)
+  const result = settle(group);
+  const resultCardTitle = document.getElementById("result-card-title");
+  if (resultCardTitle) {
+    resultCardTitle.textContent = group.expenses.length > 0 ? result.headline : t("result.empty");
+  }
+
+  // Update polite aria-live region (Rule 7: only announce result.headline)
+  const ariaLive = document.getElementById("aria-live");
+  if (ariaLive) {
+    ariaLive.textContent = result.headline;
+  }
+}
+
+// Initialize state from storage or share link
+function initState() {
+  // Check share hash #g=
+  const hash = window.location.hash;
+  if (hash.startsWith("#g=")) {
+    const encoded = hash.slice(3);
+    const decoded = decodeGroup(encoded);
+    if (decoded.ok) {
+      group = decoded.group;
+      isViewing = true;
+      render();
+      return;
+    }
+  }
+
+  // Otherwise load saved group from storage
+  const loaded = loadGroup();
+  if (loaded) {
+    group = loaded;
+  } else {
+    group = newGroup("");
+  }
+
+  render();
+}
+
+// DOM Ready
 document.addEventListener("DOMContentLoaded", function () {
   initStaticCopy();
   initLogoFallback();
   initThemeToggle();
   initLoader();
+  initState();
 });

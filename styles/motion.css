@@ -179,6 +179,22 @@ html.no-loader .hero-section {
   transform: translateY(0);
 }
 
+/* Micro-interaction: Slide Down */
+@keyframes slideDown {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Micro-interaction: Undo Timer shrink */
+@keyframes shrinkTimer {
+  0% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.undo-timer-anim {
+  animation: shrinkTimer 5000ms linear forwards;
+}
+
 /* Reduced motion overrides */
 @media (prefers-reduced-motion: reduce) {
   #app-loader {
