@@ -8,6 +8,13 @@ import { getTheme, setTheme, loadGroup, saveGroup } from "./store.js";
 import { renderGroupCard } from "./group-ui.js";
 import { renderPaymentCard } from "./payment-ui.js";
 import { renderPaymentsList } from "./list-ui.js";
+import { renderResultCard } from "./result-ui.js";
+import { renderUntangleCard, highlightTransferArrow } from "./untangle-ui.js";
+import { renderBalancesCard } from "./balances-ui.js";
+import { renderShareCard } from "./share-ui.js";
+import { renderViewingBanner } from "./view-ui.js";
+import { renderHowItWorks, renderPrivacyStrip, renderDsaSection, renderCtaCard } from "./sections-ui.js";
+import { initScrollReveal } from "./motion.js";
 
 // State
 let group = newGroup("");
@@ -15,6 +22,7 @@ let previousGroup = null;
 let editingId = null;
 let lastPayerId = null;
 let isViewing = false;
+let badLink = false;
 let undoTimeout = null;
 
 // Initialize text content from COPY dictionary
@@ -38,10 +46,10 @@ function initStaticCopy() {
   if (listCardTitle) listCardTitle.textContent = t("list.heading");
 
   const resultCardTitle = document.getElementById("result-card-title");
-  if (resultCardTitle) resultCardTitle.textContent = t("result.empty");
+  if (resultCardTitle) resultCardTitle.textContent = "Settle-up plan";
 
   const untangleCardTitle = document.getElementById("untangle-card-title");
-  if (untangleCardTitle) untangleCardTitle.textContent = t("untangle.after", { count: "0" }) || "Untangle";
+  if (untangleCardTitle) untangleCardTitle.textContent = "The Untangle";
 
   const balancesCardTitle = document.getElementById("balances-card-title");
   if (balancesCardTitle) balancesCardTitle.textContent = t("balances.heading");
@@ -186,7 +194,7 @@ function hideUndoToast() {
   }
 }
 
-// Updates group after a change
+// Group updates handler
 function handleUpdateGroup(newGrp, payerId = null) {
   group = newGrp;
   if (payerId) lastPayerId = payerId;
@@ -194,7 +202,7 @@ function handleUpdateGroup(newGrp, payerId = null) {
   render();
 }
 
-// Handles payment edit trigger
+// Payment edit triggers
 function handleEditExpense(id) {
   if (isViewing) return;
   editingId = id;
@@ -205,13 +213,12 @@ function handleEditExpense(id) {
   }
 }
 
-// Handles payment edit cancel
 function handleCancelEdit() {
   editingId = null;
   render();
 }
 
-// Handles payment delete with Undo
+// Payment delete handler
 function handleDeleteExpense(id) {
   if (isViewing) return;
   previousGroup = group;
@@ -225,13 +232,42 @@ function handleDeleteExpense(id) {
   }
 }
 
+// Make my copy handler from shared view
+function handleMakeCopy() {
+  isViewing = false;
+  badLink = false;
+  render();
+}
+
 // Main render coordinator
 export function render() {
+  const viewingSlot = document.getElementById("viewing-banner-slot");
   const groupBody = document.getElementById("group-card-body");
   const paymentBody = document.getElementById("payment-card-body");
   const listBody = document.getElementById("list-card-body");
+  const resultBody = document.getElementById("result-card-body");
+  const untangleBody = document.getElementById("untangle-card-body");
+  const balancesBody = document.getElementById("balances-card-body");
+  const shareBody = document.getElementById("share-card-body");
+  const howBody = document.getElementById("how-card-body");
+  const privacyBody = document.getElementById("privacy-strip-body");
+  const dsaBody = document.getElementById("dsa-card-body");
+  const ctaActions = document.getElementById("cta-actions");
 
-  // Render Group Card
+  // Calculate results once (Rule 5: settle() for results)
+  const result = settle(group);
+
+  // 1. Viewing Banner
+  if (viewingSlot) {
+    renderViewingBanner(viewingSlot, {
+      isViewing,
+      badLink,
+      group,
+      onMakeCopy: handleMakeCopy
+    });
+  }
+
+  // 2. Group Card
   if (groupBody) {
     renderGroupCard(groupBody, {
       group,
@@ -240,7 +276,7 @@ export function render() {
     });
   }
 
-  // Render Payment Card
+  // 3. Payment Card
   if (paymentBody) {
     const editingExpense = editingId !== null ? group.expenses.find(function (e) { return e.id === editingId; }) : null;
     renderPaymentCard(paymentBody, {
@@ -253,7 +289,7 @@ export function render() {
     });
   }
 
-  // Render Payments List
+  // 4. Payments List
   if (listBody) {
     renderPaymentsList(listBody, {
       group,
@@ -263,23 +299,75 @@ export function render() {
     });
   }
 
-  // Update Result Card preview (Rule 5: settle() for results)
-  const result = settle(group);
-  const resultCardTitle = document.getElementById("result-card-title");
-  if (resultCardTitle) {
-    resultCardTitle.textContent = group.expenses.length > 0 ? result.headline : t("result.empty");
+  // 5. Result Card
+  if (resultBody) {
+    renderResultCard(resultBody, {
+      group,
+      result,
+      onHoverTransfer: highlightTransferArrow,
+      isViewing
+    });
   }
 
-  // Update polite aria-live region (Rule 7: only announce result.headline)
+  // 6. Untangle Card
+  if (untangleBody) {
+    renderUntangleCard(untangleBody, {
+      group,
+      result
+    });
+  }
+
+  // 7. Balances Card
+  if (balancesBody) {
+    renderBalancesCard(balancesBody, {
+      group,
+      result
+    });
+  }
+
+  // 8. Share Card
+  if (shareBody) {
+    renderShareCard(shareBody, {
+      group,
+      result
+    });
+  }
+
+  // 9. How It Works
+  if (howBody) {
+    renderHowItWorks(howBody);
+  }
+
+  // 10. Privacy Strip
+  if (privacyBody) {
+    renderPrivacyStrip(privacyBody);
+  }
+
+  // 11. DSA Under the Hood
+  if (dsaBody) {
+    renderDsaSection(dsaBody, {
+      group,
+      result
+    });
+  }
+
+  // 12. CTA Card Actions
+  if (ctaActions) {
+    renderCtaCard(ctaActions);
+  }
+
+  // 13. Update polite aria-live region (Rule 7: only announce result.headline)
   const ariaLive = document.getElementById("aria-live");
   if (ariaLive) {
     ariaLive.textContent = result.headline;
   }
+
+  // Trigger scroll reveal observer for newly rendered cards
+  initScrollReveal();
 }
 
 // Initialize state from storage or share link
 function initState() {
-  // Check share hash #g=
   const hash = window.location.hash;
   if (hash.startsWith("#g=")) {
     const encoded = hash.slice(3);
@@ -287,12 +375,14 @@ function initState() {
     if (decoded.ok) {
       group = decoded.group;
       isViewing = true;
+      badLink = false;
       render();
       return;
+    } else {
+      badLink = true;
     }
   }
 
-  // Otherwise load saved group from storage
   const loaded = loadGroup();
   if (loaded) {
     group = loaded;
