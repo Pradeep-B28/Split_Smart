@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="ww-grad-left" x1="8" y1="12" x2="32" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+    <linearGradient id="ww-grad-right" x1="56" y1="12" x2="28" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+  </defs>
+  <!-- Left arrow curving into the tick -->
+  <path d="M12 24 C12 36 20 46 28 48" stroke="url(#ww-grad-left)" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Right arrow curving down and up into tick checkmark -->
+  <path d="M52 24 C52 38 42 48 28 48" stroke="url(#ww-grad-right)" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Tick mark extending up from meeting point -->
+  <path d="M22 36 L28 44 L44 22" stroke="#059669" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Small arrowheads on the incoming curved flows -->
+  <path d="M8 26 L12 20 L16 26" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M48 26 L52 20 L56 26" stroke="#06B6D4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

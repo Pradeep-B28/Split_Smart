@@ -1,0 +1,202 @@
+/* App Loader */
+#app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  /* Failsafe: if JS fails, CSS animation removes the loader by 2 seconds */
+  animation: loaderFailsafe 250ms var(--ease) 1750ms forwards;
+}
+
+html.no-loader #app-loader {
+  display: none !important;
+}
+
+#app-loader.loader-dismissed {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 250ms var(--ease), visibility 250ms;
+}
+
+.loader-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.loader-logo {
+  height: 48px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+}
+
+.loader-logo-fallback {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--brand);
+}
+
+.loader-animation-stage {
+  width: 96px;
+  height: 64px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-stage-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.coin-dot {
+  transform-origin: center;
+}
+
+.coin-1 {
+  animation: coinSlideLeft 800ms var(--ease-out) infinite alternate;
+}
+
+.coin-2 {
+  animation: coinSlideRight 800ms var(--ease-out) infinite alternate;
+}
+
+.coin-3 {
+  animation: coinSlideTop 800ms var(--ease-out) infinite alternate;
+}
+
+.loader-tick {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawTick 800ms var(--ease-out) infinite alternate;
+}
+
+@keyframes coinSlideLeft {
+  0% { transform: translate(-20px, -12px); opacity: 0.3; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+@keyframes coinSlideRight {
+  0% { transform: translate(20px, -12px); opacity: 0.3; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+@keyframes coinSlideTop {
+  0% { transform: translate(0, -18px); opacity: 0.3; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+@keyframes drawTick {
+  0%, 40% { stroke-dashoffset: 24; opacity: 0; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.loader-bar-track {
+  width: 180px;
+  height: 4px;
+  background-color: var(--surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: var(--brand-grad);
+  transform-origin: left center;
+  animation: loaderProgress 800ms var(--ease-out) forwards;
+}
+
+@keyframes loaderProgress {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes loaderFailsafe {
+  0% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; visibility: hidden; }
+}
+
+/* Hero entrance after loader ends */
+html.has-loader .hero-section {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out);
+}
+
+html.has-loader.hero-visible .hero-section {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html.no-loader .hero-section {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Micro-interaction: Form Field Shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.field-shake {
+  animation: shake 300ms var(--ease);
+}
+
+/* Micro-interaction: Pop in */
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pop-in {
+  animation: popIn 200ms var(--ease-out);
+}
+
+/* Scroll reveal helper */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  #app-loader {
+    display: none !important;
+  }
+
+  html.has-loader .hero-section,
+  .hero-section,
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

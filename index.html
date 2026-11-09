@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Split Smart | Wrench Wise</title>
+  <meta name="description" content="Split any trip. Settle in the fewest payments. Free bill splitter by Wrench Wise.">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0F172A">
+  <meta property="og:title" content="Split Smart | Wrench Wise">
+  <meta property="og:description" content="Split any trip. Settle in the fewest payments.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.png">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/motion.css">
+  <script src="js/theme-init.js"></script>
+</head>
+<body>
+  <!-- Loader: Shown on first visit of session -->
+  <div id="app-loader" aria-hidden="true">
+    <div class="loader-center">
+      <img src="assets/logo.png" alt="Wrench Wise" class="loader-logo" id="loader-logo-img">
+      <div class="loader-animation-stage">
+        <svg class="loader-stage-svg" viewBox="0 0 96 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Flow arcs -->
+          <path d="M16 20 C24 36 36 46 48 48" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+          <path d="M80 20 C72 36 60 46 48 48" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+          <!-- Sliding coin dots -->
+          <circle class="coin-dot coin-1" cx="32" cy="34" r="5" fill="#059669"/>
+          <circle class="coin-dot coin-2" cx="64" cy="34" r="5" fill="#06B6D4"/>
+          <circle class="coin-dot coin-3" cx="48" cy="22" r="5" fill="#0D9488"/>
+          <!-- Meeting tick -->
+          <path class="loader-tick" d="M42 46 L47 51 L56 38" stroke="#059669" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="loader-bar-track">
+        <div class="loader-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Link Viewing Banner (Phase 3) -->
+  <div id="viewing-banner-slot"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="./" class="brand-wrapper" aria-label="Wrench Wise Split Smart Home">
+        <img src="assets/logo.png" alt="Wrench Wise" class="brand-logo-img" id="header-logo-img">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="app-title-badge">Split Smart</span>
+      </a>
+      <div class="header-actions">
+        <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle light and dark theme">
+          <!-- Sun icon (for dark theme) -->
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon icon (for light theme) -->
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="header-brand-bar"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <div class="container">
+      <!-- Hero -->
+      <section class="hero-section" id="hero-section">
+        <div class="hero-eyebrow" id="hero-eyebrow">Free bill splitter</div>
+        <h1 class="hero-title" id="hero-title">Split any trip. Settle in the fewest payments.</h1>
+        <p class="hero-sub" id="hero-sub">Add your friends and who paid what. Split Smart works out who owes whom, with as few transfers as possible.</p>
+      </section>
+
+      <!-- App Grid (Two columns on laptop, single column on phone) -->
+      <div class="app-grid">
+        <!-- Left Column: Group, Payment Form, Payments List -->
+        <div class="grid-col-left">
+          <!-- Group Card -->
+          <section class="card" id="group-card" aria-labelledby="group-card-title">
+            <div class="card-header">
+              <h2 class="card-title" id="group-card-title">Group</h2>
+              <span class="card-subtitle" id="group-count-badge"></span>
+            </div>
+            <div id="group-card-body">
+              <div class="card-placeholder-content" id="group-placeholder-content">
+                <!-- Group inputs will be mounted here in Phase 2 -->
+              </div>
+            </div>
+          </section>
+
+          <!-- Add Payment Card -->
+          <section class="card" id="payment-card" aria-labelledby="payment-card-title">
+            <div class="card-header">
+              <h2 class="card-title" id="payment-card-title">Add a payment</h2>
+            </div>
+            <div id="payment-card-body">
+              <!-- Hard Rule 13 & verify check: input id="amount" inputmode="decimal" -->
+              <div class="form-group">
+                <label for="amount" class="form-label" id="amount-label">Amount</label>
+                <div class="amount-input-wrapper">
+                  <span class="amount-symbol" aria-hidden="true">₹</span>
+                  <input id="amount" inputmode="decimal" autocomplete="off" class="form-input amount-input" placeholder="0">
+                </div>
+                <div class="form-error" id="amount-error" aria-live="polite"></div>
+              </div>
+              <div class="card-placeholder-content" id="payment-placeholder-content">
+                <!-- Rest of payment form fields mounted here in Phase 2 -->
+              </div>
+            </div>
+          </section>
+
+          <!-- Payments List Card -->
+          <section class="card" id="list-card" aria-labelledby="list-card-title">
+            <div class="card-header">
+              <h2 class="card-title" id="list-card-title">Payments</h2>
+              <span class="card-subtitle tabular-nums" id="list-total-badge"></span>
+            </div>
+            <div id="list-card-body">
+              <div class="card-placeholder-content" id="list-placeholder-content">
+                <!-- Payments list mounted here in Phase 2 -->
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right Column: Result Card & Untangle Card -->
+        <div class="grid-col-right">
+          <!-- Result Card -->
+          <section class="card" id="result-card" aria-labelledby="result-card-title">
+            <div class="card-header">
+              <h2 class="card-title" id="result-card-title">Settle-up plan</h2>
+            </div>
+            <div id="result-card-body">
+              <div class="card-placeholder-content" id="result-placeholder-content">
+                <!-- Results mounted here in Phase 3 -->
+              </div>
+            </div>
+          </section>
+
+          <!-- Untangle Card -->
+          <section class="card" id="untangle-card" aria-labelledby="untangle-card-title">
+            <div class="card-header">
+              <h2 class="card-title" id="untangle-card-title">The Untangle</h2>
+            </div>
+            <div id="untangle-card-body">
+              <div class="card-placeholder-content" id="untangle-placeholder-content">
+                <!-- Untangle visualization mounted here in Phase 3 -->
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Lower Stacked Sections -->
+      <div class="sections-stacked">
+        <!-- Balances Section -->
+        <section class="card" id="balances-card" aria-labelledby="balances-card-title">
+          <div class="card-header">
+            <h2 class="card-title" id="balances-card-title">Where everyone stands</h2>
+          </div>
+          <div id="balances-card-body">
+            <div class="card-placeholder-content" id="balances-placeholder-content">
+              <!-- Balances bars mounted in Phase 3 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Share Section -->
+        <section class="card" id="share-card" aria-labelledby="share-card-title">
+          <div class="card-header">
+            <h2 class="card-title" id="share-card-title">Send it to the group</h2>
+          </div>
+          <div id="share-card-body">
+            <div class="card-placeholder-content" id="share-placeholder-content">
+              <!-- WhatsApp and Copy actions mounted in Phase 3 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- How it Works Section -->
+        <section class="card" id="how-card" aria-labelledby="how-card-title">
+          <div class="card-header">
+            <h2 class="card-title" id="how-card-title">How it works</h2>
+          </div>
+          <div id="how-card-body">
+            <div class="card-placeholder-content" id="how-placeholder-content">
+              <!-- Steps mounted in Phase 3 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Privacy Strip -->
+        <section class="card" id="privacy-strip" aria-labelledby="privacy-strip-title">
+          <div class="card-header">
+            <h2 class="card-title" id="privacy-strip-title">Privacy</h2>
+          </div>
+          <div id="privacy-strip-body">
+            <div class="card-placeholder-content" id="privacy-placeholder-content">
+              <!-- Privacy guarantee and proof mounted in Phase 3 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- DSA Section -->
+        <section class="card" id="dsa-card" aria-labelledby="dsa-card-title">
+          <div class="card-header">
+            <h2 class="card-title" id="dsa-card-title">The DSA behind this page</h2>
+          </div>
+          <div id="dsa-card-body">
+            <div class="card-placeholder-content" id="dsa-placeholder-content">
+              <!-- DSA cards mounted in Phase 3 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA Card -->
+        <section class="cta-card" id="cta-card" aria-labelledby="cta-card-title">
+          <h2 class="cta-title" id="cta-card-title">Want to build tools like this?</h2>
+          <p class="cta-body" id="cta-card-body">This page is built with a hash map, greedy matching and plain JavaScript. Learn these skills step by step.</p>
+          <div class="cta-actions" id="cta-actions">
+            <!-- CTA buttons mounted in Phase 3 -->
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div id="footer-built">Built by Wrench Wise</div>
+      <div id="footer-privacy">Your group stays on your device.</div>
+    </div>
+  </footer>
+
+  <!-- Phone Sticky Bar -->
+  <div id="phone-sticky-bar" class="phone-sticky-bar" aria-hidden="true">
+    <span id="phone-sticky-count" class="tabular-nums"></span>
+    <button id="phone-sticky-btn" class="btn btn-primary btn-sm" type="button">See plan</button>
+  </div>
+
+  <!-- Screen reader live region: announces only result headline (Rule 7) -->
+  <div id="aria-live" class="sr-only" aria-live="polite"></div>
+
+  <!-- Main JavaScript Module -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
