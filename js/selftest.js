@@ -20,7 +20,7 @@ export async function runSelfTest() {
 
     window.location.hash = "";
     setGroupState(sample, false);
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 800));
 
     // Test 1: The sample shows headline and total
     const headlineEl = document.querySelector(".result-headline");
@@ -109,7 +109,7 @@ export async function runSelfTest() {
 
     // Reset to sample group for remainder of tests
     setGroupState(sampleGroup(), false);
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 800));
 
     // Test 9: Deleting payment and Undo
     const beforeDelHeadline = document.querySelector(".result-headline")?.textContent.trim();
@@ -118,7 +118,7 @@ export async function runSelfTest() {
     await new Promise((r) => setTimeout(r, 220));
     const undoBtn = document.getElementById("undo-btn");
     if (undoBtn) undoBtn.click();
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 800));
     const afterUndoHeadline = document.querySelector(".result-headline")?.textContent.trim();
     const t9 = beforeDelHeadline === afterUndoHeadline && beforeDelHeadline === "11 payments settled in 3 transfers.";
     addResult("Deleting a payment and pressing Undo brings back the same headline.", t9);
